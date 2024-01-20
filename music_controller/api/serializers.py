@@ -13,3 +13,7 @@ class CreateRoomSerializer(serializers.ModelSerializer):
         model = Room
         fields = ('guest_can_pause', 'votes_to_skip')
 
+
+class LogoutSerializer(serializers.Serializer):
+    loggedOut = serializers.BooleanField()
+

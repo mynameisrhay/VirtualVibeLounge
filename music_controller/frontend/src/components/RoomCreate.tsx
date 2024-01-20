@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
 function RoomCreate() {
   const [guestCanPause, setGuestCanPause] = useState(true);
   const [votesToSkip, setVotesToSkip] = useState(2);
+  const navigate = useNavigate();
 
   const handleGuestControlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setGuestCanPause(e.target.value === "true");
@@ -34,6 +36,7 @@ function RoomCreate() {
         const data = await response.json();
         console.log("Room created:", data);
         // Handle success, update UI, etc.
+        navigate(`/room/${data.code}`);
       } else {
         console.error("Failed to create room:", response.status);
         // Handle error, show message, etc.
@@ -91,12 +94,14 @@ function RoomCreate() {
         >
           Create Room
         </button>
-        <button
-          className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          onClick={() => console.log("Clicked back")}
-        >
-          Back
-        </button>
+        <Link to="/">
+          <button
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            onClick={() => console.log("Clicked back")}
+          >
+            Back
+          </button>
+        </Link>
       </div>
     </div>
   );
