@@ -6,8 +6,9 @@ function HomePage() {
   const navigate = useNavigate();
 
   async function handleUserInRoom() {
-    // console.log("called handleuserinroom");
+    console.log("called handleuserinroom");
     try {
+      console.log("this is before fetch but inside try");
       const response = await fetch("http://127.0.0.1:8000/api/user-in-room/", {
         method: "POST",
         headers: {
@@ -24,10 +25,15 @@ function HomePage() {
         // Handle success, update UI, etc.
 
         setRoomCode(data.code);
+        console.log(data.code);
       } else {
         console.error("Error Response: ", response.status);
         // Handle error, show message, etc.
       }
+      console.log("last line of try, after await fetch line");
+      roomCode
+        ? navigate(`/room/${roomCode}`)
+        : console.log("won't navigate, room code is empty");
     } catch (error) {
       console.error("API error:", error);
       // Handle error, show message, etc.
@@ -36,11 +42,14 @@ function HomePage() {
 
   useEffect(() => {
     console.log(
-      `called useEffect | Room code: ${roomCode ? roomCode : "null"}`
+      `called useEffect | Room code: ${roomCode ? roomCode : "empty string"}`
     );
     handleUserInRoom();
 
-    roomCode && navigate(`/room/${roomCode}`);
+    // roomCode
+    //   ? navigate(`/room/${roomCode}`)
+    //   : console.log("won't navigate, room code is empty");
+    console.log("last line of useEffect");
   }, [roomCode]);
 
   return (

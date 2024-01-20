@@ -74,6 +74,7 @@ function Room() {
   };
 
   useEffect(() => {
+    console.log("called useEffect inside Room component");
     handleViewRoom();
   }, []); // The empty dependency array ensures useEffect runs only once after mounting
 

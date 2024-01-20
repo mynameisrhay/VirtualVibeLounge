@@ -4,8 +4,12 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import RoomCreate from "./components/RoomCreate";
 import RoomJoin from "./components/RoomJoin";
 import Room from "./components/Room";
+import { useEffect } from "react";
 
 function App() {
+  useEffect(() => {
+    console.log("useEffect inside App component");
+  }, []);
   return (
     <Router>
       <Routes>
