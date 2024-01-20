@@ -40,7 +40,6 @@ function Room() {
   }
 
   const handleViewRoom = async () => {
-    console.log("function handleViewRoom is called");
     try {
       const response = await fetch(
         `http://127.0.0.1:8000/api/access/?code=${code}`,
@@ -74,7 +73,6 @@ function Room() {
   };
 
   useEffect(() => {
-    console.log("called useEffect inside Room component");
     handleViewRoom();
   }, []); // The empty dependency array ensures useEffect runs only once after mounting
 

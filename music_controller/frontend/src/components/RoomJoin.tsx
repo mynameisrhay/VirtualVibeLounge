@@ -42,10 +42,7 @@ function RoomJoin() {
               Enter Room
             </button>
             <Link to="/">
-              <button
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                onClick={() => console.log("Clicked back")}
-              >
+              <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                 Back
               </button>
             </Link>
