@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api.apps.ApiConfig',
-    'rest_framework'
+    'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -49,7 +50,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Add this line
+
 ]
+
+# CORS settings
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173", # My React app URL
+    # Add other allowed origins if needed
+]
+CORS_ALLOW_CREDENTIALS = True
+
+SESSION_COOKIE_SAMESITE = 'None'
 
 ROOT_URLCONF = 'music_controller.urls'
 

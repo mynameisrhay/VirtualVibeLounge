@@ -1,5 +1,8 @@
+import RoomCreate from "./RoomCreate";
+import RoomJoin from "./RoomJoin";
+
 function HomePage() {
-  return <h1>This is the home page!</h1>;
+  return <div>This is the home page. Design is up coming.</div>;
 }
 
 export default HomePage;
