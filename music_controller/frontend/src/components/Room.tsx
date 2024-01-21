@@ -5,16 +5,51 @@ import LoadingPage from "./Loading";
 function Room() {
   const [guestCanPause, setGuestCanPause] = useState(true);
   const [votesToSkip, setVotesToSkip] = useState(2);
-  const [isHost, setIsHost] = useState(null);
+  const [isHost, setIsHost] = useState(false);
   const [updateMode, setUpdateMode] = useState(false);
-  const { code } = useParams();
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const { code } = useParams();
   const navigate = useNavigate();
 
-  async function handleEditRoomEdit() {
-    console.log("Clicked edit");
-    setUpdateMode(true);
+  const handleGuestControlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setGuestCanPause(e.target.value === "true");
+  };
+
+  const handleVotesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVotesToSkip(parseInt(e.target.value));
+  };
+
+  async function handleUpdateRoom() {
+    const requestBody = {
+      guest_can_pause: guestCanPause,
+      votes_to_skip: votesToSkip,
+      // Other data to send to the Django backend
+    };
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/create/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Add any necessary headers for authorization, etc.
+        },
+        credentials: "include",
+        body: JSON.stringify(requestBody),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Room created:", data);
+        // Handle success, update UI, etc.
+        // navigate(`/room/${data.code}`);
+      } else {
+        console.error("Failed to create room:", response.status);
+        // Handle error, show message, etc.
+      }
+    } catch (error) {
+      console.error("API error:", error);
+      // Handle error, show message, etc.
+    }
+    setUpdateMode(false);
   }
 
   async function handleLogout() {
@@ -45,7 +80,7 @@ function Room() {
     }
   }
 
-  const handleViewRoom = async () => {
+  async function handleViewRoom() {
     try {
       const response = await fetch(
         `http://127.0.0.1:8000/api/access/?code=${code}`,
@@ -76,15 +111,7 @@ function Room() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleGuestControlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setGuestCanPause(e.target.value === "true");
-  };
-
-  const handleVotesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setVotesToSkip(parseInt(e.target.value));
-  };
+  }
 
   useEffect(() => {
     handleViewRoom();
@@ -106,9 +133,18 @@ function Room() {
         <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
           <h1 className="text-3xl font-bold mb-4">Room View</h1>
           <p className="text-lg mb-2">Room Code: {code}</p>
+          <p className="text-lg mb-2">
+            Is Host:{" "}
+            <span
+              className={
+                isHost ? "text-green-600 font-bold" : "text-red-600 font-bold"
+              }
+            >
+              {isHost ? "YES" : "NO"}
+            </span>
+          </p>
           {updateMode ? (
-            <div className="mb-4">
-              <hr />
+            <div className="mb-4 bg-green-50">
               <h3 className="text-2xl font-bold mb-4 text-green-700">
                 Edit Mode
               </h3>
@@ -146,10 +182,9 @@ function Room() {
                   id="votes"
                   value={votesToSkip}
                   onChange={handleVotesChange}
-                  className="w-full border rounded-md px-3 py-2"
+                  className="w-full border rounded-md px-3 py-2 bg-green-50 text-center"
                 />
               </div>
-              <hr />
             </div>
           ) : (
             <>
@@ -171,36 +206,27 @@ function Room() {
               </p>
             </>
           )}
-          <p className="text-lg mb-2">
-            Is Host:{" "}
-            <span
-              className={
-                isHost ? "text-green-600 font-bold" : "text-red-600 font-bold"
-              }
-            >
-              {isHost ? "YES" : "NO"}
-            </span>
-          </p>
+
           <div className="flex justify-between">
             {isHost &&
               (!updateMode ? (
                 <button
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  onClick={handleEditRoomEdit}
+                  className="bg-green-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  onClick={() => setUpdateMode(true)}
                 >
                   Edit
                 </button>
               ) : (
                 <>
                   <button
-                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    onClick={console.log("Save")}
+                    className="bg-blue-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    onClick={handleUpdateRoom}
                   >
                     Save
                   </button>
                   <button
-                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    onClick={console.log("Cancel Saving")}
+                    className="bg-red-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    onClick={() => setUpdateMode(false)}
                   >
                     Cancel
                   </button>

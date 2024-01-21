@@ -14,7 +14,7 @@ function RoomCreate() {
     setVotesToSkip(parseInt(e.target.value));
   };
 
-  const handleCreateRoom = async () => {
+  async function handleCreateRoom() {
     const requestBody = {
       guest_can_pause: guestCanPause,
       votes_to_skip: votesToSkip,
@@ -45,7 +45,7 @@ function RoomCreate() {
       console.error("API error:", error);
       // Handle error, show message, etc.
     }
-  };
+  }
 
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
