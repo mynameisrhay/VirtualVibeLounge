@@ -27,7 +27,6 @@ function HomePage() {
         console.error("Error Response: ", response.status);
         // Handle error, show message, etc.
       }
-      roomCode && navigate(`/room/${roomCode}`);
     } catch (error) {
       console.error("API error:", error);
       // Handle error, show message, etc.
@@ -35,7 +34,13 @@ function HomePage() {
   }
 
   useEffect(() => {
-    handleUserInRoom();
+    if (roomCode) {
+      console.log("has room code, will navigate");
+      navigate(`/room/${roomCode}`);
+    } else {
+      console.log("no room code, call handleuserinroom");
+      handleUserInRoom();
+    }
   }, [roomCode]);
 
   return (
