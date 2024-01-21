@@ -3,13 +3,19 @@ import { useParams, useNavigate } from "react-router-dom";
 import LoadingPage from "./Loading";
 
 function Room() {
-  const [guestCanPause, setGuestCanPause] = useState(null);
-  const [votesToSkip, setVotesToSkip] = useState(null);
+  const [guestCanPause, setGuestCanPause] = useState(true);
+  const [votesToSkip, setVotesToSkip] = useState(2);
   const [isHost, setIsHost] = useState(null);
+  const [updateMode, setUpdateMode] = useState(false);
   const { code } = useParams();
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+
+  async function handleEditRoomEdit() {
+    console.log("Clicked edit");
+    setUpdateMode(true);
+  }
 
   async function handleLogout() {
     try {
@@ -72,9 +78,17 @@ function Room() {
     }
   };
 
+  const handleGuestControlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setGuestCanPause(e.target.value === "true");
+  };
+
+  const handleVotesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVotesToSkip(parseInt(e.target.value));
+  };
+
   useEffect(() => {
     handleViewRoom();
-  }, []); // The empty dependency array ensures useEffect runs only once after mounting
+  }, [updateMode]); // The empty dependency array ensures useEffect runs only once after mounting
 
   return (
     <div className="text-center mt-8">
@@ -89,26 +103,74 @@ function Room() {
           <span className="block sm:inline"> {errorMessage}</span>
         </div>
       ) : (
-        <>
+        <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
           <h1 className="text-3xl font-bold mb-4">Room View</h1>
           <p className="text-lg mb-2">Room Code: {code}</p>
-
-          <p className="text-lg mb-2">
-            Guest Can Pause:{" "}
-            <span
-              className={
-                guestCanPause
-                  ? "text-green-600 font-bold"
-                  : "text-red-600 font-bold"
-              }
-            >
-              {guestCanPause ? "YES" : "NO"}
-            </span>
-          </p>
-          <p className="text-lg mb-2">
-            Required Votes to Skip:{" "}
-            <span className="text-blue-600 font-bold">{votesToSkip}</span>
-          </p>
+          {updateMode ? (
+            <div className="mb-4">
+              <hr />
+              <h3 className="text-2xl font-bold mb-4 text-green-700">
+                Edit Mode
+              </h3>
+              <p className="text-gray-600 mb-2">
+                Guest control or playback state
+              </p>
+              <label className="inline-flex items-center mr-4">
+                <input
+                  type="radio"
+                  className="form-radio h-5 w-5 text-blue-600"
+                  name="guestControl"
+                  value="true"
+                  checked={guestCanPause}
+                  onChange={handleGuestControlChange}
+                />
+                <span className="ml-2">Play/Pause</span>
+              </label>
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  className="form-radio h-5 w-5 text-blue-600"
+                  name="guestControl"
+                  value="false"
+                  checked={!guestCanPause}
+                  onChange={handleGuestControlChange}
+                />
+                <span className="ml-2">No Control</span>
+              </label>
+              <div className="mb-4">
+                <label htmlFor="votes" className="text-gray-600 mb-2 block">
+                  Votes to Skip
+                </label>
+                <input
+                  type="number"
+                  id="votes"
+                  value={votesToSkip}
+                  onChange={handleVotesChange}
+                  className="w-full border rounded-md px-3 py-2"
+                />
+              </div>
+              <hr />
+            </div>
+          ) : (
+            <>
+              <p className="text-lg mb-2">
+                Guest Can Pause:{" "}
+                <span
+                  className={
+                    guestCanPause
+                      ? "text-green-600 font-bold"
+                      : "text-red-600 font-bold"
+                  }
+                >
+                  {guestCanPause ? "YES" : "NO"}
+                </span>
+              </p>
+              <p className="text-lg mb-2">
+                Required Votes to Skip:{" "}
+                <span className="text-blue-600 font-bold">{votesToSkip}</span>
+              </p>
+            </>
+          )}
           <p className="text-lg mb-2">
             Is Host:{" "}
             <span
@@ -119,14 +181,39 @@ function Room() {
               {isHost ? "YES" : "NO"}
             </span>
           </p>
-
-          <button
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
-        </>
+          <div className="flex justify-between">
+            {isHost &&
+              (!updateMode ? (
+                <button
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  onClick={handleEditRoomEdit}
+                >
+                  Edit
+                </button>
+              ) : (
+                <>
+                  <button
+                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    onClick={console.log("Save")}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    onClick={console.log("Cancel Saving")}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ))}
+            <button
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
