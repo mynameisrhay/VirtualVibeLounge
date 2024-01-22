@@ -6,12 +6,13 @@ function Room() {
   const [guestCanPause, setGuestCanPause] = useState(true);
   const [votesToSkip, setVotesToSkip] = useState(2);
   const [isHost, setIsHost] = useState(false);
-  const [updateMode, setUpdateMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const { code } = useParams();
   const navigate = useNavigate();
+  const [updateMode, setUpdateMode] = useState(false);
 
+  // event functions
   const handleGuestControlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setGuestCanPause(e.target.value === "true");
   };
@@ -20,6 +21,7 @@ function Room() {
     setVotesToSkip(parseInt(e.target.value));
   };
 
+  // async functions
   async function handleUpdateRoom() {
     const requestBody = {
       guest_can_pause: guestCanPause,
@@ -113,22 +115,101 @@ function Room() {
     }
   }
 
+  // display/render functions (this might be a separate component in the future but for now, it will be a function)
+  const handleDisplayError = (errorMessageDisplayed: string) => {
+    return (
+      <div
+        className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
+        <strong className="font-bold">Error | </strong>
+        <span className="block sm:inline"> {errorMessageDisplayed}</span>
+      </div>
+    );
+  };
+
+  const handleDisplayEditMode = () => {
+    return (
+      <div className="mb-4 bg-green-50">
+        <h3 className="text-2xl font-bold mb-4 text-green-700">Edit Mode</h3>
+        <p className="text-gray-600 mb-2">Guest control or playback state</p>
+        <label className="inline-flex items-center mr-4">
+          <input
+            type="radio"
+            className="form-radio h-5 w-5 text-blue-600"
+            name="guestControl"
+            value="true"
+            checked={guestCanPause}
+            onChange={handleGuestControlChange}
+          />
+          <span className="ml-2">Play/Pause</span>
+        </label>
+        <label className="inline-flex items-center">
+          <input
+            type="radio"
+            className="form-radio h-5 w-5 text-blue-600"
+            name="guestControl"
+            value="false"
+            checked={!guestCanPause}
+            onChange={handleGuestControlChange}
+          />
+          <span className="ml-2">No Control</span>
+        </label>
+        <div className="mb-4">
+          <label htmlFor="votes" className="text-gray-600 mb-2 block">
+            Votes to Skip
+          </label>
+          <input
+            type="number"
+            id="votes"
+            value={votesToSkip}
+            onChange={handleVotesChange}
+            className="w-full border rounded-md px-3 py-2 bg-green-50 text-center"
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const handleDisplayEditButtons = () => {
+    return (
+      isHost &&
+      (!updateMode ? (
+        <button
+          className="bg-green-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          onClick={() => setUpdateMode(true)}
+        >
+          Edit
+        </button>
+      ) : (
+        <>
+          <button
+            className="bg-blue-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            onClick={handleUpdateRoom}
+          >
+            Save
+          </button>
+          <button
+            className="bg-red-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            onClick={() => setUpdateMode(false)}
+          >
+            Cancel
+          </button>
+        </>
+      ))
+    );
+  };
+
   useEffect(() => {
     handleViewRoom();
-  }, [updateMode]); // The empty dependency array ensures useEffect runs only once after mounting
+  }, [updateMode]);
 
   return (
     <div className="text-center mt-8">
       {loading ? (
         <LoadingPage />
       ) : errorMessage ? (
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-          role="alert"
-        >
-          <strong className="font-bold">Error | </strong>
-          <span className="block sm:inline"> {errorMessage}</span>
-        </div>
+        handleDisplayError(errorMessage)
       ) : (
         <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
           <h1 className="text-3xl font-bold mb-4">Room View</h1>
@@ -144,48 +225,7 @@ function Room() {
             </span>
           </p>
           {updateMode ? (
-            <div className="mb-4 bg-green-50">
-              <h3 className="text-2xl font-bold mb-4 text-green-700">
-                Edit Mode
-              </h3>
-              <p className="text-gray-600 mb-2">
-                Guest control or playback state
-              </p>
-              <label className="inline-flex items-center mr-4">
-                <input
-                  type="radio"
-                  className="form-radio h-5 w-5 text-blue-600"
-                  name="guestControl"
-                  value="true"
-                  checked={guestCanPause}
-                  onChange={handleGuestControlChange}
-                />
-                <span className="ml-2">Play/Pause</span>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="form-radio h-5 w-5 text-blue-600"
-                  name="guestControl"
-                  value="false"
-                  checked={!guestCanPause}
-                  onChange={handleGuestControlChange}
-                />
-                <span className="ml-2">No Control</span>
-              </label>
-              <div className="mb-4">
-                <label htmlFor="votes" className="text-gray-600 mb-2 block">
-                  Votes to Skip
-                </label>
-                <input
-                  type="number"
-                  id="votes"
-                  value={votesToSkip}
-                  onChange={handleVotesChange}
-                  className="w-full border rounded-md px-3 py-2 bg-green-50 text-center"
-                />
-              </div>
-            </div>
+            handleDisplayEditMode()
           ) : (
             <>
               <p className="text-lg mb-2">
@@ -208,30 +248,7 @@ function Room() {
           )}
 
           <div className="flex justify-between">
-            {isHost &&
-              (!updateMode ? (
-                <button
-                  className="bg-green-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  onClick={() => setUpdateMode(true)}
-                >
-                  Edit
-                </button>
-              ) : (
-                <>
-                  <button
-                    className="bg-blue-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    onClick={handleUpdateRoom}
-                  >
-                    Save
-                  </button>
-                  <button
-                    className="bg-red-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    onClick={() => setUpdateMode(false)}
-                  >
-                    Cancel
-                  </button>
-                </>
-              ))}
+            {handleDisplayEditButtons()}
             <button
               className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               onClick={handleLogout}
