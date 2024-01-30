@@ -42,6 +42,12 @@ function Room() {
     }
   }
 
+  const handleAuthenticationClick = () => {
+    // Redirect the user to the Spotify authentication endpoint
+    window.location.href =
+      "http://127.0.0.1:8000/spotify/spotify-authenticate/";
+  };
+
   const handleViewRoom = async () => {
     try {
       const response = await fetch(
@@ -150,6 +156,9 @@ function Room() {
                 onClick={handleLogout}
               >
                 Logout
+              </button>
+              <button onClick={handleAuthenticationClick}>
+                Authenticate with Spotify
               </button>
             </div>
           </div>

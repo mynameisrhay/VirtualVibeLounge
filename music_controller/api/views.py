@@ -4,7 +4,6 @@ from .models import Room
 from .serializers import RoomSerializer, CreateRoomSerializer,LogoutSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.http import JsonResponse
 
 
 class RoomView(generics.ListAPIView):
@@ -66,7 +65,7 @@ class UserInRoom(APIView):
                 return Response({'message': 'Successfully logged out'})
 
         data = {
-            'code': self.request.session.get('room_code')
+            'code': self.request.session.get('room_code'),
         }
         return Response(data, status=status.HTTP_201_CREATED)
 
